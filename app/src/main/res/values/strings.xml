@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Lidderbuch</string>
+    <string name="no">No</string>
+    <string name="text">Text</string>
+    <string name="melodie">Melodie</string>
+    <string name="tune">Weis</string>
+    <string name="text_and_melodie">Text a Melodie</string>
+</resources>

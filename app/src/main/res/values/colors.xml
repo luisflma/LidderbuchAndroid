@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="lidderbuchColor">#b11a15</color>
+    <color name="darkGray">#5d5d5d</color>
+    <color name="mediumGray">#E2E2E2</color>
+
+    <color name="newGray">#E3E4E7</color>
+
+
+    <color name="whiteColor">#ffffff</color>
+    <color name="bgLightGray">#F7F7F7</color>
+    <color name="separatorGray">#A5ABAC</color>
+    <color name="listDividerGray">#EFEFEF</color>
+    <color name="hintGray">#A5ABAC</color>
+    <color name="titleGray">#393939</color>
+
+
+
+
+    <!-- Dialpad colors -->
+    <color name="dialpad_primary_text_color">#ffffff</color> <!--33b5e5-->
+    <color name="dialpad_secondary_text_color">#aaaaaa</color>
+    <color name="background_dialpad">#f2020709</color>
+    <color name="dialpad_text_color">#ffffff</color>
+
+    <!-- Yallet colors -->
+    <color name="blueColor">#35449d</color>
+    <color name="darkBlueColor">#26367f</color>
+    <color name="lightBlueColor">#ff6473cf</color>
+    <color name="greenColor1">#6b9082</color>
+    <color name="greenColor2">#769f90</color>
+    <color name="greenColor3">#82af9e</color>
+    <color name="greenColor4">#93c6b3</color>
+    <color name="lightGray">#f7f7f7</color>
+    <color name="orange">#f7931a</color>
+    <color name="neverUsedAddress">#8cb8a7</color>
+    <color name="txGreenColor">#71AA22</color>
+    <color name="txRedColor">#BA2525</color>
+
+</resources>
+

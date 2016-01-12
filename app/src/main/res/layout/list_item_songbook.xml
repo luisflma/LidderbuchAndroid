@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/titleGray">
+
+    <TextView
+        android:id="@+id/headerTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="5dp"
+        android:textColor="@color/lidderbuchColor"
+        android:background="@color/whiteColor"
+        android:text="Traditionell"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:orientation="vertical"
+        android:background="@color/whiteColor">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="15sp"
+                android:textColor="@color/lidderbuchColor"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="Gaudeamus Igitur, Kindleben"
+                android:textSize="15sp"
+                android:textColor="@color/titleGray"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Gaudeamus igitur \niiuvenus dum sumus"
+            android:textSize="15sp"
+            android:textColor="@color/hintGray"/>
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_with_search">
+    </include>
+
+    <LinearLayout
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bgLightGray">
+
+        <ListView
+            android:id="@+id/singleChoiceListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:listSelector="@drawable/list_selector"
+            android:divider="@color/listDividerGray"
+            android:dividerHeight="1dp"
+            android:visibility="visible">
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@color/bgLightGray">
+            <ImageView
+                android:id="@+id/emptyStateImg"
+                android:layout_gravity="center"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/empty_songbook" />
+            <TextView
+                android:id="@+id/emptyStateLbl"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/hintGray"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
