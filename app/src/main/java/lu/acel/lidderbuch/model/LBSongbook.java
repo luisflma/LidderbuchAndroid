@@ -2,6 +2,7 @@ package lu.acel.lidderbuch.model;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,30 +29,38 @@ public class LBSongbook {
     private ArrayList<LBSong> songs;
     private ArrayList<String> categories;
 
+    public ArrayList<LBSong> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(ArrayList<LBSong> songs) {
+        this.songs = songs;
+    }
+
     public LBSongbook(Context context) {
         songs = load(context);
-
-
     }
 
     private ArrayList<LBSong> load(Context context) {
 
         ArrayList<LBSong> songsList = new ArrayList<>();
         // try loading from local songs file
-        File songsFile = new File(context.getFilesDir(), Settings.SONGS_FILE);
-        if(!songsFile.exists()) {
-            try {
-                songsFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        File songsFile = new File(context.getFilesDir(), Settings.SONGS_FILE);
+//        if(!songsFile.exists()) {
+//            try {
+//                songsFile.createNewFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         String songsStr = FileHelper.readFromFile(context);
         if(!TextUtils.isEmpty(songsStr)) {
+            Log.i("Songbook", "songs string from file is not empty");
             songsList = songsWithData(songsStr);
         } else {
             // try loading songs delivered json file from asset folder
+            Log.i("Songbook", "try load songs from json file from assets");
             songsList = songsWithData(loadJSONFromAsset(context));
         }
 
@@ -118,6 +127,7 @@ public class LBSongbook {
 
     private ArrayList<LBSong> songsWithData(String songsTxt) {
 
+        Log.i("Songbook", "songs json : " + songsTxt);
         ArrayList<LBSong> songsList = new ArrayList<>();
         try {
             JSONArray jsonSongs = new JSONArray(songsTxt);
@@ -139,6 +149,7 @@ public class LBSongbook {
 
         for(int i = 0 ; i < songs.size() ; i++) {
             if(updateTime == null || songs.get(i).getUpdateTime().getTime() > updateTime.getTime()) {
+                Log.i("Songbook", "song updateTime:" + songs.get(i).getUpdateTime());
                 updateTime = songs.get(i).getUpdateTime();
             }
         }

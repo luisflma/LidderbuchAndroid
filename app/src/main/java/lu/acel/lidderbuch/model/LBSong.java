@@ -2,6 +2,7 @@ package lu.acel.lidderbuch.model;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -47,12 +49,28 @@ public class LBSong {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public URL getUrl() {
         return url;
     }
 
     public void setUrl(URL url) {
         this.url = url;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Date getUpdateTime() {
@@ -81,8 +99,11 @@ public class LBSong {
             category = jsonSong.getString("category");
             position = jsonSong.getInt("position");
 
-            //TODO timestamp to date (updateTime)
-            String timeStamp = jsonSong.getString("update_time");
+            String timeStampStr = jsonSong.getString("update_time");
+            if(!TextUtils.isEmpty(timeStampStr)){
+                long timeStamp = Long.parseLong(timeStampStr);
+                updateTime = new Date(timeStamp * 1000);
+            }
 
             paragraphs = new ArrayList<>();
             JSONArray paragraphsJson = jsonSong.getJSONArray("paragraphs");
@@ -102,8 +123,12 @@ public class LBSong {
 
             bookmarked = jsonSong.optBoolean("bookmarked");
             views = jsonSong.optInt("views");
-            // TODO timestamp to date (viewTime)
-            String viewTimeStamp = jsonSong.optString("viewTime");
+
+            String viewTimeStampStr = jsonSong.optString("viewTime");
+            if(!TextUtils.isEmpty(viewTimeStampStr)) {
+                long viewTimeStamp = Long.parseLong(viewTimeStampStr);
+                viewTime = new Date(viewTimeStamp * 1000);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

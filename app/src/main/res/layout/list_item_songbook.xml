@@ -7,7 +7,7 @@
     android:background="@color/titleGray">
 
     <TextView
-        android:id="@+id/headerTextView"
+        android:id="@+id/tvHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
@@ -36,6 +36,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
@@ -43,6 +44,7 @@
                 android:textColor="@color/lidderbuchColor"/>
 
             <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
@@ -53,6 +55,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvPreview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="Gaudeamus igitur \niiuvenus dum sumus"
