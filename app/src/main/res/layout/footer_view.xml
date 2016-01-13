@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="40dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:gravity="center">
@@ -12,7 +12,7 @@
         android:id="@+id/tvUpdateTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Update date : 13/01/16"
+        android:text="Update date : --.--.--"
         android:textSize="15sp"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"

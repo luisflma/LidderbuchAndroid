@@ -64,6 +64,9 @@ public class LBSongbook {
             songsList = songsWithData(loadJSONFromAsset(context));
         }
 
+        if(songsList == null)
+            return new ArrayList<LBSong>();
+
         return songsList;
     }
 
@@ -78,21 +81,21 @@ public class LBSongbook {
         hasChangesToSave = false;
     }
 
-    private void upload() {
-        try {
-            URL url = new URL(Settings.SONGBOOK_API);
-
-            //todo call http request
-            
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void update(final Context context, final YalletSimpleCallback callback){
+//        try {
+//            URL url = new URL(Settings.SONGBOOK_API);
+//
+//            //todo call http request
+//
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public String loadJSONFromAsset(Context context) {
         String json = null;
         try {
-            InputStream is = context.getAssets().open("songs.json");
+            InputStream is = context.getAssets().open(Settings.SONGS_JSON);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -125,7 +128,10 @@ public class LBSongbook {
         return songsList;
     }
 
-    private ArrayList<LBSong> songsWithData(String songsTxt) {
+    public static ArrayList<LBSong> songsWithData(String songsTxt) {
+
+        if(TextUtils.isEmpty(songsTxt))
+            return null;
 
         Log.i("Songbook", "songs json : " + songsTxt);
         ArrayList<LBSong> songsList = new ArrayList<>();
@@ -145,8 +151,11 @@ public class LBSongbook {
     }
 
     public Date updateTime() {
-        Date updateTime = null;
 
+        if(songs == null)
+            return null;
+
+        Date updateTime = null;
         for(int i = 0 ; i < songs.size() ; i++) {
             if(updateTime == null || songs.get(i).getUpdateTime().getTime() > updateTime.getTime()) {
                 Log.i("Songbook", "song updateTime:" + songs.get(i).getUpdateTime());
@@ -155,6 +164,42 @@ public class LBSongbook {
         }
 
         return updateTime;
+    }
+
+    public void integrateSongs(ArrayList<LBSong> newSongs, boolean replaceMeta) {
+        for(int i = 0; i < newSongs.size() ; i++) {
+            integrateSong(newSongs.get(i), replaceMeta, (i != newSongs.size() - 1));
+        }
+
+    }
+
+    private void integrateSong(LBSong newSong, boolean replaceMeta, boolean propagate) {
+
+        // is the song already included
+        int idx = songs.indexOf(newSong);
+        if(idx > -1) {
+            LBSong oldSong = songs.get(idx);
+            if(newSong.getUpdateTime().getTime() > oldSong.getUpdateTime().getTime() || (replaceMeta && newSong.getUpdateTime().getTime() == oldSong.getUpdateTime().getTime())) {
+                if(!replaceMeta) {
+                    newSong.setBookmarked(oldSong.isBookmarked());
+                    newSong.setViews(oldSong.getViews());
+                    newSong.setViewTime(oldSong.getViewTime());
+                }
+
+                // replace song
+                songs.set(idx, newSong);
+            }
+        }
+        else {
+            // add song to library
+            songs.add(newSong);
+        }
+
+        if(propagate) {
+            reloadMeta();
+
+            hasChangesToSave = true;
+        }
     }
 
 
