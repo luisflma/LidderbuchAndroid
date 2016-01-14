@@ -1,6 +1,7 @@
 package lu.acel.lidderbuch.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,6 +42,7 @@ import java.util.Scanner;
 
 import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.Settings;
+import lu.acel.lidderbuch.SongActivity;
 import lu.acel.lidderbuch.design.SongbookAdapter;
 import lu.acel.lidderbuch.model.LBSong;
 import lu.acel.lidderbuch.model.LBSongbook;
@@ -115,7 +117,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleClickOnSong(View view) {
-
+        Intent i = new Intent(this, SongActivity.class);
+        LBSong song = songbook.songWithId((int)view.getTag());
+        i.putExtra("song", song);
+        startActivity(i);
     }
 
     private void refreshFooter(Date updateTime) {

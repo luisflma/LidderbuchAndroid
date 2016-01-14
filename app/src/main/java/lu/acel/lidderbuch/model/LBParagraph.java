@@ -3,13 +3,23 @@ package lu.acel.lidderbuch.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by luis-fleta on 12/01/16.
  */
-public class LBParagraph {
+public class LBParagraph implements Serializable{
     private int id;
     private String type;
     private String content;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getContent() {
         return content;

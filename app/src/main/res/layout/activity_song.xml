@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="lu.acel.lidderbuch.SongActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_with_search">
+    </include>
+
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:layout_below="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ons Heemecht"
+                android:textSize="20sp"
+                android:textColor="@color/lidderbuchColor" />
+
+            <TextView
+                android:id="@+id/tvDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="No 2 . Text: Michel Lentz . Melodie: Johann-Anton Zinnen . 1864"
+                android:textSize="16sp"
+                android:lineSpacingExtra="5dp"
+                android:textColor="@color/hintGray" />
+
+            <TextView
+                android:id="@+id/tvLyrics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Wou d'Uelzecht durech d Wisen zeit \nDuerch d'Fieldsen d Sauer brecht"
+                android:textSize="16sp"
+                android:lineSpacingExtra="5dp"
+                android:textColor="@color/titleGray" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>

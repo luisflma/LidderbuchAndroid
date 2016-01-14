@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -18,13 +19,14 @@ import java.util.Date;
 import java.util.Locale;
 
 import lu.acel.lidderbuch.R;
+import lu.acel.lidderbuch.network.StringHelper;
 
 import com.google.common.base.Joiner;
 
 /**
  * Created by luis-fleta on 12/01/16.
  */
-public class LBSong {
+public class LBSong implements Serializable{
     private int id;
     private String name;
     private String language;
@@ -74,6 +76,14 @@ public class LBSong {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public ArrayList<LBParagraph> getParagraphs() {
+        return paragraphs;
+    }
+
+    public void setParagraphs(ArrayList<LBParagraph> paragraphs) {
+        this.paragraphs = paragraphs;
     }
 
     public Date getUpdate_time() {
@@ -155,15 +165,15 @@ public class LBSong {
 
             // optional attributes
             number = jsonSong.optInt("number");
-            way = jsonSong.optString("way");
+            way = StringHelper.optString(jsonSong, "way");
             year = jsonSong.optInt("year");
-            lyrics_author = jsonSong.optString("lyrics_author");
-            melody_author = jsonSong.optString("melody_author");
+            lyrics_author = StringHelper.optString(jsonSong, "lyrics_author");
+            melody_author = StringHelper.optString(jsonSong, "melody_author");
 
             bookmarked = jsonSong.optBoolean("bookmarked");
             views = jsonSong.optInt("views");
 
-            String viewTimeStampStr = jsonSong.optString("viewTime");
+            String viewTimeStampStr = StringHelper.optString(jsonSong, "viewTime");
             if(!TextUtils.isEmpty(viewTimeStampStr)) {
                 try{
                     long viewTimeStamp = Long.parseLong(viewTimeStampStr);
