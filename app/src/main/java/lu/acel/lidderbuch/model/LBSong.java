@@ -10,9 +10,12 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import lu.acel.lidderbuch.R;
 
@@ -29,7 +32,7 @@ public class LBSong {
     private String category;
     private int position;
     private ArrayList<LBParagraph> paragraphs;
-    private Date updateTime;
+    private Date update_time;
 
     private boolean bookmarked = false;
     private int views = 0;
@@ -38,8 +41,8 @@ public class LBSong {
     private int number;
     private String way;
     private int year;
-    private String lyricsAuthor;
-    private String melodyAuthor;
+    private String lyrics_author;
+    private String melody_author;
 
     public int getId() {
         return id;
@@ -73,12 +76,12 @@ public class LBSong {
         this.category = category;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Date getUpdate_time() {
+        return update_time;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdate_time(Date update_time) {
+        this.update_time = update_time;
     }
 
     public int getViews() {
@@ -125,8 +128,20 @@ public class LBSong {
 
             String timeStampStr = jsonSong.getString("update_time");
             if(!TextUtils.isEmpty(timeStampStr)){
-                long timeStamp = Long.parseLong(timeStampStr);
-                updateTime = new Date(timeStamp * 1000);
+                try{
+                    long timeStamp = Long.parseLong(timeStampStr);
+                    update_time = new Date(timeStamp * 1000);
+                } catch(NumberFormatException nfe) {
+                    //SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy  hh:mm:ss a");
+                    try {
+                        Log.i("Song", "timeStampStr:" + timeStampStr);
+                        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+                        update_time = format.parse(timeStampStr);
+                    } catch (ParseException e) {
+                        Log.i("Song", "ParseException::");
+                        e.printStackTrace();
+                    }
+                }
             }
 
             paragraphs = new ArrayList<>();
@@ -142,16 +157,27 @@ public class LBSong {
             number = jsonSong.optInt("number");
             way = jsonSong.optString("way");
             year = jsonSong.optInt("year");
-            lyricsAuthor = jsonSong.optString("lyrics_author");
-            melodyAuthor = jsonSong.optString("melody_author");
+            lyrics_author = jsonSong.optString("lyrics_author");
+            melody_author = jsonSong.optString("melody_author");
 
             bookmarked = jsonSong.optBoolean("bookmarked");
             views = jsonSong.optInt("views");
 
             String viewTimeStampStr = jsonSong.optString("viewTime");
             if(!TextUtils.isEmpty(viewTimeStampStr)) {
-                long viewTimeStamp = Long.parseLong(viewTimeStampStr);
-                viewTime = new Date(viewTimeStamp * 1000);
+                try{
+                    long viewTimeStamp = Long.parseLong(viewTimeStampStr);
+                    update_time = new Date(viewTimeStamp * 1000);
+                } catch(NumberFormatException nfe) {
+                    //SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy  h:mm:ss a");
+                    try {
+                        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+                        update_time = format.parse(timeStampStr);
+                    } catch (ParseException e) {
+                        Log.i("Song", "ParseException:ViewTimeStamp:");
+                        e.printStackTrace();
+                    }
+                }
             }
 
         } catch (JSONException e) {
@@ -194,16 +220,16 @@ public class LBSong {
             parts.add(context.getString(R.string.tune) + ": " + way);
         }
 
-        if(!TextUtils.isEmpty(lyricsAuthor) && lyricsAuthor.equals(melodyAuthor)) {
-            parts.add(context.getString(R.string.text_and_melodie) + ": " + lyricsAuthor);
+        if(!TextUtils.isEmpty(lyrics_author) && lyrics_author.equals(melody_author)) {
+            parts.add(context.getString(R.string.text_and_melodie) + ": " + lyrics_author);
         }
         else {
-            if(!TextUtils.isEmpty(lyricsAuthor)) {
-                parts.add(context.getString(R.string.text) + ": " + lyricsAuthor);
+            if(!TextUtils.isEmpty(lyrics_author)) {
+                parts.add(context.getString(R.string.text) + ": " + lyrics_author);
             }
 
-            if(!TextUtils.isEmpty(melodyAuthor)) {
-                parts.add(context.getString(R.string.melodie) + ": " + melodyAuthor);
+            if(!TextUtils.isEmpty(melody_author)) {
+                parts.add(context.getString(R.string.melodie) + ": " + melody_author);
             }
         }
 
@@ -232,7 +258,7 @@ public class LBSong {
             jsonSong.put("url", url.toString());
             jsonSong.put("category", category);
             jsonSong.put("position", position);
-            jsonSong.put("update_time", updateTime.getTime());
+            jsonSong.put("update_time", update_time.getTime());
 
             jsonSong.put("paragraphs", paragraphsJson);
 
@@ -245,8 +271,8 @@ public class LBSong {
             jsonSong.put("number", number);
             jsonSong.put("way", !TextUtils.isEmpty(way) ? way : null);
             jsonSong.put("year", year);
-            jsonSong.put("lyrics_author", !TextUtils.isEmpty(lyricsAuthor) ? lyricsAuthor : null);
-            jsonSong.put("melody_author", !TextUtils.isEmpty(melodyAuthor) ? melodyAuthor : null);
+            jsonSong.put("lyrics_author", !TextUtils.isEmpty(lyrics_author) ? lyrics_author : null);
+            jsonSong.put("melody_author", !TextUtils.isEmpty(melody_author) ? melody_author : null);
 
             return jsonSong.toString();
         } catch (JSONException e) {

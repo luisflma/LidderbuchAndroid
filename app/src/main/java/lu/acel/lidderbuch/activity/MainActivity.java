@@ -89,13 +89,12 @@ public class MainActivity extends AppCompatActivity {
 
         songbook = new LBSongbook(this);
 
+        handler.post(runnableSongs);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        handler.post(runnableSongs);
 
         refreshFooter(songbook.updateTime());
 
@@ -103,6 +102,15 @@ public class MainActivity extends AppCompatActivity {
             songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, songbook.getSongs());
             songbookListview.addFooterView(footerView);
             songbookListview.setAdapter(songbookAdapter);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(songbook.isHasChangesToSave()) {
+            songbook.save(this);
         }
     }
 

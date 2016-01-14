@@ -1,7 +1,11 @@
 package lu.acel.lidderbuch;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Environment;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -134,5 +138,40 @@ public class FileHelper {
         }
 
         return ret;
+    }
+
+//    public void readFile() {
+//        File yourFile = new File(Environment.getExternalStorageDirectory(), "path/to/the/file/inside_the_sdcard/textarabics.txt");
+//        FileInputStream stream = new FileInputStream(yourFile);
+//        String jsonStr = null;
+//        try {
+//            FileChannel fc = stream.getChannel();
+//            MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+//
+//            jsonStr = Charset.defaultCharset().decode(bb).toString();
+//        }
+//        finally {
+//            stream.close();
+//        }
+//    }
+
+    public void storeSongs(Context context, JSONObject songsJson) {
+        // store songs json
+        storeKey(context, "songsJson", songsJson.toString());
+    }
+
+    public static void storeKey(Context context, String key, String data) {
+        SharedPreferences settings;
+        settings = context.getSharedPreferences("LIDDERBUCH", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(key, data);
+        editor.commit();
+    }
+
+    public static String getKey(Context context, String key) {
+        SharedPreferences settings;
+        settings = context.getSharedPreferences("LIDDERBUCH", Context.MODE_PRIVATE);
+        return settings.getString(key, null);
     }
 }

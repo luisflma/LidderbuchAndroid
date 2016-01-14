@@ -4,18 +4,17 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import lu.acel.lidderbuch.FileHelper;
 import lu.acel.lidderbuch.Settings;
@@ -28,6 +27,14 @@ public class LBSongbook {
     private boolean hasChangesToSave;
     private ArrayList<LBSong> songs;
     private ArrayList<String> categories;
+
+    public boolean isHasChangesToSave() {
+        return hasChangesToSave;
+    }
+
+    public void setHasChangesToSave(boolean hasChangesToSave) {
+        this.hasChangesToSave = hasChangesToSave;
+    }
 
     public ArrayList<LBSong> getSongs() {
         return songs;
@@ -54,7 +61,8 @@ public class LBSongbook {
 //            }
 //        }
 
-        String songsStr = FileHelper.readFromFile(context);
+        String songsStr = FileHelper.getKey(context, "songsJson");
+
         if(!TextUtils.isEmpty(songsStr)) {
             Log.i("Songbook", "songs string from file is not empty");
             songsList = songsWithData(songsStr);
@@ -70,14 +78,21 @@ public class LBSongbook {
         return songsList;
     }
 
-    private void save(Context context) {
-        JSONArray songsJson = new JSONArray();
+    public void save(Context context) {
+//        JSONArray songsJson = new JSONArray();
 
-        for(LBSong s : songs) {
-            songsJson.put(s.json());
-        }
+//        for(LBSong s : songs) {
+//            Log.i("Songbook", "sss:" + s.json());
+//            songsJson.put(s);
+//        }
 
-        FileHelper.writeToFile(songsJson.toString(), context);
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(songs);
+
+        //FileHelper.writeToFile(songsJson.toString(), context);
+
+        //Log.i("Songbook", "SAVE JSON SONGS : " + jsonStr);
+        FileHelper.storeKey(context, "songsJson", jsonStr);
         hasChangesToSave = false;
     }
 
@@ -133,13 +148,14 @@ public class LBSongbook {
         if(TextUtils.isEmpty(songsTxt))
             return null;
 
-        Log.i("Songbook", "songs json : " + songsTxt);
+        //Log.i("Songbook", "songs json : " + songsTxt);
         ArrayList<LBSong> songsList = new ArrayList<>();
         try {
             JSONArray jsonSongs = new JSONArray(songsTxt);
 
-            for(int j = 0 ; j < jsonSongs.length() ; j++) {
-                JSONObject songJson = jsonSongs.getJSONObject(j);
+            for(int i = 0 ; i < jsonSongs.length() ; i++) {
+
+                JSONObject songJson = jsonSongs.getJSONObject(i);
                 songsList.add(new LBSong(songJson));
             }
 
@@ -157,9 +173,9 @@ public class LBSongbook {
 
         Date updateTime = null;
         for(int i = 0 ; i < songs.size() ; i++) {
-            if(updateTime == null || songs.get(i).getUpdateTime().getTime() > updateTime.getTime()) {
-                Log.i("Songbook", "song updateTime:" + songs.get(i).getUpdateTime());
-                updateTime = songs.get(i).getUpdateTime();
+            if(updateTime == null || songs.get(i).getUpdate_time().getTime() > updateTime.getTime()) {
+                Log.i("Songbook", "song updateTime:" + songs.get(i).getUpdate_time());
+                updateTime = songs.get(i).getUpdate_time();
             }
         }
 
@@ -168,7 +184,7 @@ public class LBSongbook {
 
     public void integrateSongs(ArrayList<LBSong> newSongs, boolean replaceMeta) {
         for(int i = 0; i < newSongs.size() ; i++) {
-            integrateSong(newSongs.get(i), replaceMeta, (i != newSongs.size() - 1));
+            integrateSong(newSongs.get(i), replaceMeta, (i == newSongs.size() - 1));
         }
 
     }
@@ -179,7 +195,7 @@ public class LBSongbook {
         int idx = songs.indexOf(newSong);
         if(idx > -1) {
             LBSong oldSong = songs.get(idx);
-            if(newSong.getUpdateTime().getTime() > oldSong.getUpdateTime().getTime() || (replaceMeta && newSong.getUpdateTime().getTime() == oldSong.getUpdateTime().getTime())) {
+            if(newSong.getUpdate_time().getTime() > oldSong.getUpdate_time().getTime() || (replaceMeta && newSong.getUpdate_time().getTime() == oldSong.getUpdate_time().getTime())) {
                 if(!replaceMeta) {
                     newSong.setBookmarked(oldSong.isBookmarked());
                     newSong.setViews(oldSong.getViews());
@@ -196,6 +212,7 @@ public class LBSongbook {
         }
 
         if(propagate) {
+            Log.i("Songbook", "HAS CHANGES TO SAVE = TRUE");
             reloadMeta();
 
             hasChangesToSave = true;
