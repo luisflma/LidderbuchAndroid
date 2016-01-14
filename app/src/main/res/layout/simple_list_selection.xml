@@ -6,7 +6,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_with_search">
+        layout="@layout/toolbar_songs">
     </include>
 
     <LinearLayout

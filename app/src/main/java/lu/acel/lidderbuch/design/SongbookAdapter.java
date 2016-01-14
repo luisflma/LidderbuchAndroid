@@ -1,8 +1,6 @@
 package lu.acel.lidderbuch.design;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import lu.acel.lidderbuch.helper.FontHelper;
 import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.model.LBSong;
 
@@ -47,6 +46,11 @@ public class SongbookAdapter extends ArrayAdapter<LBSong> {
             TextView numberTv = (TextView) view.findViewById(R.id.tvNumber);
             TextView titleTv = (TextView) view.findViewById(R.id.tvTitle);
             TextView previewTv = (TextView) view.findViewById(R.id.tvPreview);
+
+            headerTv.setTypeface(FontHelper.georgia);
+            numberTv.setTypeface(FontHelper.georgia);
+            titleTv.setTypeface(FontHelper.georgia);
+            previewTv.setTypeface(FontHelper.georgia);
 
             // category header
             if(position > 0) {

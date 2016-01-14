@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/copy_into_clipboard"
+        android:title="@string/copy_into_clipboard" />
+    <item android:id="@+id/send_by_sms"
+        android:title="@string/send_by_message" />
+    <item android:id="@+id/send_by_email"
+        android:title="@string/send_by_email" />
+</menu>

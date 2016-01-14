@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="lu.acel.lidderbuch.SongActivity">
+    tools:context=".activity.SongActivity">
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_with_search">
+        layout="@layout/toolbar_song">
     </include>
 
     <ScrollView android:layout_width="match_parent"

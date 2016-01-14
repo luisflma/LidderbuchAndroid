@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import lu.acel.lidderbuch.FontHelper;
+import lu.acel.lidderbuch.helper.FontHelper;
 import lu.acel.lidderbuch.R;
 
 public class SplashActivity extends AppCompatActivity {

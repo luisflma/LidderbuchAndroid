@@ -1,4 +1,4 @@
-package lu.acel.lidderbuch;
+package lu.acel.lidderbuch.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
+import lu.acel.lidderbuch.Settings;
 
 /**
  * Created by luis-fleta on 12/01/16.

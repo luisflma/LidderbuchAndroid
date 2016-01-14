@@ -25,7 +25,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SongActivity"></activity>
+        <activity android:name=".activity.SongActivity"></activity>
     </application>
 
 </manifest>

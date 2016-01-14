@@ -1,4 +1,4 @@
-package lu.acel.lidderbuch;
+package lu.acel.lidderbuch.helper;
 
 import android.content.Context;
 import android.graphics.Typeface;

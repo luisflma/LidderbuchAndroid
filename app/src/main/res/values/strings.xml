@@ -6,4 +6,8 @@
     <string name="tune">Weis</string>
     <string name="text_and_melodie">Text a Melodie</string>
     <string name="update_time">Leschten Update:</string>
+    <string name="send_by_message">Send by message</string>
+    <string name="send_by_email">Send by email</string>
+    <string name="copy_into_clipboard">Copy into clipboard</string>
+    <string name="cant_use_mail">Lidderbuch can not use the mail application. Please copy/paste your address.</string>
 </resources>
