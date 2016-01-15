@@ -2,60 +2,50 @@ package lu.acel.lidderbuch.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
 import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.Settings;
-import lu.acel.lidderbuch.SongActivity;
 import lu.acel.lidderbuch.design.SongbookAdapter;
 import lu.acel.lidderbuch.model.LBSong;
 import lu.acel.lidderbuch.model.LBSongbook;
 import lu.acel.lidderbuch.network.LBFetchSongs;
-import lu.acel.lidderbuch.network.LBFetchSongsCallback;
 
 public class MainActivity extends AppCompatActivity {
 
     private LBSongbook songbook;
+    private SearchView toolbarSearchButton;
 
     private ListView songbookListview;
     private SongbookAdapter songbookAdapter;
     private View footerView;
+
+    Parcelable state; // saves the scroll position of the listview
+
+    private Thread thread;
 
     // Fetch songs
     Handler handler = new Handler();
@@ -79,7 +69,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simple_list_selection);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar); // Attaching the layout to the toolbar object
+        setSupportActionBar(toolbar);
+
         footerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.footer_view, null, false);
+        toolbarSearchButton = (SearchView) findViewById(R.id.toolbarSearchButton);
+
+        toolbarSearchButton.clearFocus();
+        setupSearchView(toolbarSearchButton);
+//        ((EditText)toolbarSearchButton.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setTextColor(Color.BLACK);
+//        // icon
+//        ImageView searchIcon = (ImageView) toolbarSearchButton.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+//        searchIcon.setImageResource(R.drawable.search_icon);
+
+        toolbarSearchButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                searchInSongbook(newText);
+
+                return true;
+            }
+        });
+//        int id = toolbarSearchButton.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+//        TextView textView = (TextView) toolbarSearchButton.findViewById(id);
+//        textView.setTextColor(Color.WHITE);
 
         songbookListview = (ListView) findViewById(R.id.singleChoiceListView);
         songbookListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,6 +112,29 @@ public class MainActivity extends AppCompatActivity {
 
         handler.post(runnableSongs);
     }
+    private void setupSearchView(SearchView searchView)
+    {
+        // search hint
+        searchView.setQueryHint("Rechercher");
+        searchView.clearFocus();
+
+        // background
+        View searchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        //searchPlate.setBackgroundResource(R.drawable.searchview_bg);
+
+        // icon
+        ImageView searchIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+        searchIcon.setImageResource(R.drawable.search_icon);
+
+        // clear button
+        ImageView searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        searchClose.setImageResource(R.drawable.back_icon);
+
+        // text color
+        AutoCompleteTextView searchText = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchText.setTextColor(getResources().getColor(R.color.darkGray));
+        searchText.setHintTextColor(getResources().getColor(R.color.hintGray));
+    }
 
     @Override
     protected void onResume() {
@@ -105,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
             songbookListview.addFooterView(footerView);
             songbookListview.setAdapter(songbookAdapter);
         }
+
+        if(state != null)
+            songbookListview.onRestoreInstanceState(state);
+
+        toolbarSearchButton.clearFocus();
     }
 
     @Override
@@ -114,6 +161,15 @@ public class MainActivity extends AppCompatActivity {
         if(songbook.isHasChangesToSave()) {
             songbook.save(this);
         }
+
+        state = songbookListview.onSaveInstanceState();
+    }
+
+    @Override
+    protected void onStop() {
+        if(thread != null)
+            thread.interrupt();
+        super.onStop();
     }
 
     private void handleClickOnSong(View view) {
@@ -121,6 +177,37 @@ public class MainActivity extends AppCompatActivity {
         LBSong song = songbook.songWithId((int)view.getTag());
         i.putExtra("song", song);
         startActivity(i);
+    }
+
+    private void searchInSongbook(String newText) {
+        final String text = newText;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                ArrayList<LBSong> songsResult = songbook.search(text);
+
+                Log.i("MainActivity", "result count:" + songsResult.size());
+
+                for (LBSong song : songsResult) {
+                    Log.i("MainActivity", "song name:" + song.getName());
+                }
+
+                if(!Thread.currentThread().isInterrupted()) {
+                    // display welcome UI
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            // run on UI : refresh Listview
+                        }
+                    });
+                }
+            }
+        };
+
+        thread = new Thread(runnable);
+        thread.start();
     }
 
     private void refreshFooter(Date updateTime) {

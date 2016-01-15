@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
+import lu.acel.lidderbuch.helper.StringHelper;
+
 /**
  * Created by luis-fleta on 12/01/16.
  */
@@ -58,10 +60,9 @@ public class LBParagraph implements Serializable{
 
     public int search(String keywords) {
 
-        // TODO LBPARAGRAPH implement search method
         // search score is determined by occurence count
-        // see : Model/String.swift
-        return 0;
+        return StringHelper.countOccurrences(content, keywords);
+
     }
 
     public boolean isRefrain() {

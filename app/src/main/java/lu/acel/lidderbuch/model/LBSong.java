@@ -13,13 +13,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 import lu.acel.lidderbuch.R;
-import lu.acel.lidderbuch.network.StringHelper;
+import lu.acel.lidderbuch.helper.StringHelper;
 
 import com.google.common.base.Joiner;
 
@@ -309,8 +308,45 @@ public class LBSong implements Serializable{
     private int lastSearchScore;
 
     public int search(String keywords) {
-        // TODO LBSONG implement search method
-         return 0;
+
+        // retrieve cached result
+        if(!TextUtils.isEmpty(lastSearchKeywords) && lastSearchKeywords.equals(keywords)) {
+            return lastSearchScore;
+        }
+
+        // determin search score for given keywords
+        int score = 0;
+
+        // search in meta data
+        score += StringHelper.countOccurrences(name, keywords);
+
+        Log.i("Song", "name:" + name + " score:" + score);
+
+        if(!TextUtils.isEmpty(way)) {
+            score += StringHelper.countOccurrences(way, keywords);
+        }
+
+        if(!TextUtils.isEmpty(lyrics_author)) {
+            score += StringHelper.countOccurrences(lyrics_author, keywords);
+        }
+
+        if(!TextUtils.isEmpty(melody_author) && !TextUtils.isEmpty(lyrics_author) && !lyrics_author.equals(melody_author)) {
+            score += StringHelper.countOccurrences(melody_author, keywords);
+        }
+
+        // an occurence in meta data is 3x more important
+        score *= 3;
+
+        // search score of paragraphs
+        for (LBParagraph para : paragraphs){
+            score += para.search(keywords);
+        }
+
+        // cache search result
+        lastSearchKeywords = keywords;
+        lastSearchScore = score;
+
+        return score;
     }
 
 }

@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
-import lu.acel.lidderbuch.FileHelper;
+import lu.acel.lidderbuch.helper.FileHelper;
 import lu.acel.lidderbuch.Settings;
 
 /**
@@ -224,8 +224,37 @@ public class LBSongbook {
         // todo reload meta
     }
 
-    public void search(String keyword) {
-        // todo search method in songbook class
+    public ArrayList<LBSong> search(String keyword) { //may be callback
+
+        ArrayList<LBSong> songsResult = new ArrayList<>();
+
+        // handle song number
+        int number;
+        try {
+            number = Integer.parseInt(keyword);
+            LBSong song = songWithNumber(number);
+
+            if(song != null) {
+                songsResult.add(song);
+                return songsResult;
+            }
+        } catch(NumberFormatException nfe) {
+            //nfe.printStackTrace();
+        }
+
+        // return no results when query too short
+        if(keyword.length() <= 2) {
+            return songsResult;
+        }
+
+        // search in songs
+        for(LBSong so : songs) {
+            if(so.search(keyword) > 0) {
+                songsResult.add(so);
+            }
+        }
+
+        return songsResult;
     }
 
     public LBSong songWithId(int id) {
