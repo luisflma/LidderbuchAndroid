@@ -1,11 +1,14 @@
 package lu.acel.lidderbuch.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -64,6 +67,16 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            LBSong songEdited = (LBSong) intent.getSerializableExtra("song");
+            Log.d("MainActivity", "Receive song - name: " + songEdited.getName());
+            songbook.integrateSong(songEdited, true, true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 searchInSongbook(newText);
-
                 return true;
             }
         });
@@ -111,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
         songbook = new LBSongbook(this);
 
         handler.post(runnableSongs);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("song-edited-event"));
+
     }
     private void setupSearchView(SearchView searchView)
     {
@@ -128,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         // clear button
         ImageView searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-        searchClose.setImageResource(R.drawable.back_icon);
+        searchClose.setImageResource(R.drawable.close_icon);
 
         // text color
         AutoCompleteTextView searchText = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -156,13 +170,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
+
 
         if(songbook.isHasChangesToSave()) {
             songbook.save(this);
         }
 
+        // save the scroll position of the listview
         state = songbookListview.onSaveInstanceState();
+
+        super.onPause();
     }
 
     @Override
@@ -170,6 +187,13 @@ public class MainActivity extends AppCompatActivity {
         if(thread != null)
             thread.interrupt();
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+
+        super.onDestroy();
     }
 
     private void handleClickOnSong(View view) {

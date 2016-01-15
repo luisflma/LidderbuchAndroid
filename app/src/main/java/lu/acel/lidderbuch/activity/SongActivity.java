@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -31,7 +33,7 @@ import lu.acel.lidderbuch.model.LBSong;
 
 public class SongActivity extends AppCompatActivity {
 
-    private ImageView toolbarBackButton, toolbarShareButton;
+    private ImageView toolbarBackButton, toolbarShareButton, toolbarBookmarkButon;
     private TextView tvName, tvDetail, tvLyrics;
     private LBSong song;
 
@@ -52,6 +54,7 @@ public class SongActivity extends AppCompatActivity {
         // menu button
         toolbarBackButton = (ImageView) findViewById(R.id.toolbarBackButton);
         toolbarShareButton = (ImageView) findViewById(R.id.toolbarSharetButton);
+        toolbarBookmarkButon = (ImageView) findViewById(R.id.toolbarBookmarktButton);
 
         toolbarBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +70,13 @@ public class SongActivity extends AppCompatActivity {
             }
         });
 
+        toolbarBookmarkButon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bookmarkSong();
+            }
+        });
+
         // prepare song's info
         tvName = (TextView) findViewById(R.id.tvName);
         tvDetail = (TextView) findViewById(R.id.tvDetail);
@@ -77,9 +87,14 @@ public class SongActivity extends AppCompatActivity {
     }
 
     private void updateLayout() {
+        // set is bookmarked image
+        toolbarBookmarkButon.setImageResource(song.isBookmarked() ? R.drawable.bookmarked_icon : R.drawable.bookmark_icon);
+
+        // set song's info
         tvName.setText(song.getName());
         tvDetail.setText(song.detail(this));
 
+        // set lyrics (refrain is in italic)
         String lyricsOriginal = "";
         for(LBParagraph para : song.getParagraphs()) {
             lyricsOriginal += para.getContent() + "\n\n";
@@ -109,6 +124,28 @@ public class SongActivity extends AppCompatActivity {
 
     private void closeActivity() {
         finish();
+    }
+
+    private void bookmarkSong() {
+
+        sendMessage();
+
+        if(song.isBookmarked()) {
+            song.setBookmarked(!song.isBookmarked()); // false
+            toolbarBookmarkButon.setImageResource(R.drawable.bookmark_icon);
+        } else {
+            song.setBookmarked(!song.isBookmarked()); // true
+            toolbarBookmarkButon.setImageResource(R.drawable.bookmarked_icon);
+        }
+
+    }
+
+    private void sendMessage() {
+        Log.d("sender", "Broadcasting message");
+        Intent intent = new Intent("song-edited-event");
+        // You can also include some extra data.
+        intent.putExtra("song", song);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override

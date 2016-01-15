@@ -189,7 +189,7 @@ public class LBSongbook {
 
     }
 
-    private void integrateSong(LBSong newSong, boolean replaceMeta, boolean propagate) {
+    public void integrateSong(LBSong newSong, boolean replaceMeta, boolean propagate) {
 
         // is the song already included
         int idx = songs.indexOf(newSong);

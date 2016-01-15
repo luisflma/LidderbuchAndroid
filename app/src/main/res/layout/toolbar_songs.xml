@@ -34,7 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     Lidderbuch:searchIcon="@drawable/search_icon"
-                    Lidderbuch:closeIcon="@drawable/back_icon"
+                    Lidderbuch:closeIcon="@drawable/close_icon"
                     Lidderbuch:queryHint="Recheeeercher"
                     Lidderbuch:iconifiedByDefault="true">
 
