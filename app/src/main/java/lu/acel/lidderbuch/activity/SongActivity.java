@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -22,8 +23,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lu.acel.lidderbuch.CustomTypefaceSpan;
 import lu.acel.lidderbuch.R;
@@ -33,9 +39,30 @@ import lu.acel.lidderbuch.model.LBSong;
 
 public class SongActivity extends AppCompatActivity {
 
+    private static final String TAG = SongActivity.class.getName();
+
+    private String lyricsOriginal;
+    private String textSplited[];
+    private int lineCount = 0;
+
+    private ScrollView svLyrics;
     private ImageView toolbarBackButton, toolbarShareButton, toolbarBookmarkButon;
     private TextView tvName, tvDetail, tvLyrics;
     private LBSong song;
+    // tracking view
+    private Timer timer;
+    private TimerTask timerTask;
+    //final Handler handler = new Handler();
+    private boolean viewTracked = false;
+
+    Handler handler = new Handler();
+
+    private Runnable runnableTrackView = new Runnable() {
+        @Override
+        public void run() {
+            trackView();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +76,26 @@ public class SongActivity extends AppCompatActivity {
         updateLayout();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.i(TAG, "on resume");
+        startTrackingView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Log.i(TAG, "on pause");
+        stopTrackingView();
+    }
+
     private void prepareLayout() {
+        // scrollview
+        svLyrics = (ScrollView) findViewById(R.id.svLyrics);
+
         // Prepare toolbar
         // menu button
         toolbarBackButton = (ImageView) findViewById(R.id.toolbarBackButton);
@@ -82,8 +128,92 @@ public class SongActivity extends AppCompatActivity {
         tvDetail = (TextView) findViewById(R.id.tvDetail);
         tvLyrics = (TextView) findViewById(R.id.tvLyrics);
 
+        tvLyrics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(lineCount < textSplited.length) {
+
+                    svLyrics.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            int y = tvLyrics.getLayout().getLineBottom(lineCount) - 200;
+                            Log.i(TAG, "y:" + y);
+                            svLyrics.smoothScrollTo(0, y);
+                        }
+                    });
+                    highlightLine();
+                    lineCount++;
+
+                } else {
+                    lineCount = 0;
+                    svLyrics.smoothScrollTo(0, 0);
+                    refreshLyrics();
+                }
+
+            }
+        });
+
         tvName.setTypeface(FontHelper.georgia);
         tvDetail.setTypeface(FontHelper.georgia);
+    }
+
+    private void highlightLine() {
+
+        if(TextUtils.isEmpty(textSplited[lineCount]))
+            lineCount++;
+
+        Log.i(TAG, "ON TAP");
+
+        Log.i(TAG, "Text size:" + textSplited.length);
+
+        SpannableStringBuilder SS = new SpannableStringBuilder(lyricsOriginal);
+        int charCount = 0;
+        int i = 0;
+        LBParagraph para = song.getParagraphs().get(i);
+        for(int j = 0 ; j < textSplited.length ; j++) {
+            Log.i(TAG, "line:" + j);
+
+            if(!TextUtils.isEmpty(textSplited[j])) {
+                Log.i(TAG, "    text splited");
+                if(j == lineCount) {
+                    Log.i(TAG, "    j+1 == line");
+                    if(para.isRefrain()) {
+                        SS.setSpan (new CustomTypefaceSpan("", FontHelper.georgiaItalicBold), charCount, charCount + textSplited[j].length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                    } else {
+                        SS.setSpan (new CustomTypefaceSpan("", FontHelper.georgiaBold), charCount, charCount + textSplited[j].length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                    }
+                } else {
+                    Log.i(TAG, "    normal");
+                    if(para.isRefrain()) {
+                        SS.setSpan (new CustomTypefaceSpan("", FontHelper.georgiaItalic), charCount, charCount + textSplited[j].length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                    } else {
+                        SS.setSpan (new CustomTypefaceSpan("", FontHelper.georgia), charCount, charCount + textSplited[j].length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                    }
+                }
+//                if(j < textSplited.length - 5)
+//                    charCount += textSplited[j].length() + 1;
+//                else
+
+                Log.i(TAG, "last:" + textSplited[j]);
+                if(lyricsOriginal.charAt(charCount + textSplited[j].length()) == '\r') {
+                    Log.i(TAG, "rrrr");
+                    charCount += textSplited[j].length() + 2;
+                }
+                else {
+                    Log.i(TAG, "nnnn");
+                    charCount += textSplited[j].length() + 1;
+                }
+            }
+            else {
+                Log.i(TAG, "    end paraph");
+                charCount += 2;
+                i++;
+                para = song.getParagraphs().get(i);
+            }
+        }
+
+        tvLyrics.setText(SS);
+
     }
 
     private void updateLayout() {
@@ -95,11 +225,17 @@ public class SongActivity extends AppCompatActivity {
         tvDetail.setText(song.detail(this));
 
         // set lyrics (refrain is in italic)
-        String lyricsOriginal = "";
+        lyricsOriginal = "";
         for(LBParagraph para : song.getParagraphs()) {
-            lyricsOriginal += para.getContent() + "\n\n";
+            lyricsOriginal += para.getContent() + "\r\n\r\n";
         }
 
+        textSplited = lyricsOriginal.split("(\\r\\n|\\n)");
+
+        refreshLyrics();
+    }
+
+    private void refreshLyrics() {
         SpannableStringBuilder SS = new SpannableStringBuilder(lyricsOriginal);
 
         int charCount = 0;
@@ -128,7 +264,7 @@ public class SongActivity extends AppCompatActivity {
 
     private void bookmarkSong() {
 
-        sendMessage();
+        sendMessageSongEdited(true);
 
         if(song.isBookmarked()) {
             song.setBookmarked(!song.isBookmarked()); // false
@@ -140,12 +276,71 @@ public class SongActivity extends AppCompatActivity {
 
     }
 
-    private void sendMessage() {
+    private void sendMessageSongEdited(boolean bookmarked) {
         Log.d("sender", "Broadcasting message");
         Intent intent = new Intent("song-edited-event");
         // You can also include some extra data.
         intent.putExtra("song", song);
+        intent.putExtra("bookmarked", bookmarked);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    // View Tracking
+    private void startTrackingView() {
+//        if(timer == null && !viewTracked) {
+//            //set a new Timer
+//            timer = new Timer();
+//
+//            //initialize the TimerTask's job
+//            initializeTimerTask();
+//
+//            //schedule the timer, TimerTask will run after 5000 ms
+//            timer.schedule(timerTask, 15000, 1000); //
+//        }
+
+        Log.i(TAG, "start tracking view");
+        if(!viewTracked) {
+            handler.postDelayed(runnableTrackView, 15000);
+            Log.i(TAG, "handler postdelayed");
+        }
+    }
+
+    private void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        trackView();
+                    }
+                });
+            }
+        };
+    }
+
+    private void stopTrackingView() {
+//        if(timer != null) {
+//            timer.cancel();
+//            timer = null;
+//        }
+
+        Log.i(TAG, "stop tracking view");
+        handler.removeCallbacks(runnableTrackView);
+    }
+
+    private void trackView() {
+        Log.i(TAG, "track view");
+        // track view
+        song.setViews(song.getViews() + 1);
+        song.setViewTime(new Date());
+
+        sendMessageSongEdited(false);
+
+        viewTracked = true;
+        stopTrackingView();
+
+        Log.i("Song", "song view tracked - views : " + song.getViews() + " viewTime:" + song.getViewTime());
     }
 
     @Override

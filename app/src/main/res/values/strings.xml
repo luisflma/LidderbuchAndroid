@@ -6,8 +6,10 @@
     <string name="tune">Weis</string>
     <string name="text_and_melodie">Text a Melodie</string>
     <string name="update_time">Leschten Update:</string>
-    <string name="send_by_message">Send by message</string>
-    <string name="send_by_email">Send by email</string>
-    <string name="copy_into_clipboard">Copy into clipboard</string>
-    <string name="cant_use_mail">Lidderbuch can not use the mail application. Please copy/paste your address.</string>
+    <string name="send_by_message">Als Noriicht verschécken</string>
+    <string name="send_by_email">Als E-Mail verschécken</string>
+    <string name="copy_into_clipboard">An d\'Tëschenooflaag kopéiren</string>
+    <string name="cant_use_mail">Keng kompatibel Mail-App fonnt. Benotzt w.e.g. d\'Tëschenooflaag.</string>
+    <string name="bookmarked">Markéiert</string>
+    <string name="search">Durchsuchen</string>
 </resources>

@@ -35,7 +35,7 @@
                     android:layout_height="match_parent"
                     Lidderbuch:searchIcon="@drawable/search_icon"
                     Lidderbuch:closeIcon="@drawable/close_icon"
-                    Lidderbuch:queryHint="Recheeeercher"
+                    Lidderbuch:queryHint="@string/search"
                     Lidderbuch:iconifiedByDefault="true">
 
                 </android.support.v7.widget.SearchView>

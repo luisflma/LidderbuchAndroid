@@ -10,7 +10,9 @@
         layout="@layout/toolbar_song">
     </include>
 
-    <ScrollView android:layout_width="match_parent"
+    <ScrollView
+        android:id="@+id/svLyrics"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
         android:layout_below="@id/toolbar">
@@ -36,7 +38,7 @@
                 android:id="@+id/tvDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:paddingTop="5dp"
                 android:text="No 2 . Text: Michel Lentz . Melodie: Johann-Anton Zinnen . 1864"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5dp"
@@ -46,11 +48,13 @@
                 android:id="@+id/tvLyrics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
                 android:text="Wou d'Uelzecht durech d Wisen zeit \nDuerch d'Fieldsen d Sauer brecht"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5dp"
-                android:textColor="@color/titleGray" />
+                android:textColor="@color/titleGray"
+                android:clickable="true"/>
 
         </LinearLayout>
 

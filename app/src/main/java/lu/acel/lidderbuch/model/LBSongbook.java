@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
+import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.helper.FileHelper;
 import lu.acel.lidderbuch.Settings;
+import lu.acel.lidderbuch.helper.SongComparator;
 
 /**
  * Created by luis-fleta on 12/01/16.
@@ -26,6 +29,7 @@ public class LBSongbook {
 
     private boolean hasChangesToSave;
     private ArrayList<LBSong> songs;
+    private ArrayList<LBSong> songsBookmarked;
     private ArrayList<String> categories;
 
     public boolean isHasChangesToSave() {
@@ -44,8 +48,17 @@ public class LBSongbook {
         this.songs = songs;
     }
 
+    public ArrayList<LBSong> getSongsBookmarked() {
+        return songsBookmarked;
+    }
+
+    public void setSongsBookmarked(ArrayList<LBSong> songsBookmarked) {
+        this.songsBookmarked = songsBookmarked;
+    }
+
     public LBSongbook(Context context) {
         songs = load(context);
+        songsBookmarked = loadBookmarked(context);
     }
 
     private ArrayList<LBSong> load(Context context) {
@@ -76,6 +89,20 @@ public class LBSongbook {
             return new ArrayList<LBSong>();
 
         return songsList;
+    }
+
+    public ArrayList<LBSong> loadBookmarked(Context context) {
+        ArrayList<LBSong> bookmarked = new ArrayList<>();
+
+        if(songs.size() == 0)
+            return bookmarked;
+
+        for(LBSong so : songs) {
+            if(so.isBookmarked())
+                bookmarked.add(bookmarkSong(so, context));
+        }
+
+        return bookmarked;
     }
 
     public void save(Context context) {
@@ -219,6 +246,24 @@ public class LBSongbook {
         }
     }
 
+    public void integrateSongBookmarked(LBSong song, Context context) {
+
+        if(songsBookmarked == null)
+            return;
+
+        if(song.isBookmarked()) {
+            songsBookmarked.add(bookmarkSong(song, context));
+        } else {
+            songsBookmarked.remove(song);
+        }
+    }
+
+    public LBSong bookmarkSong(LBSong song, Context context) {
+        LBSong copySong = new LBSong(song);
+        copySong.setCategory(context.getString(R.string.bookmarked));
+
+        return copySong;
+    }
 
     private void reloadMeta() {
         // todo reload meta
@@ -252,6 +297,18 @@ public class LBSongbook {
             if(so.search(keyword) > 0) {
                 songsResult.add(so);
             }
+        }
+
+        Log.i("Songbook", "BEFORE");
+        for(LBSong so : songsResult) {
+            Log.i("Songbook", "BEF song name:" + so.getName());
+        }
+
+        Collections.sort(songsResult);
+
+        Log.i("Songbook", "AFTER");
+        for(LBSong so : songsResult) {
+            Log.i("Songbook", "AFT song name:" + so.getName());
         }
 
         return songsResult;

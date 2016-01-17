@@ -21,6 +21,14 @@ public class SongbookAdapter extends ArrayAdapter<LBSong> {
 
     private ArrayList<LBSong> songs;
 
+    public ArrayList<LBSong> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(ArrayList<LBSong> songs) {
+        this.songs = songs;
+    }
+
     public SongbookAdapter(Context context, int resource, List<LBSong> objects) {
         super(context, resource, objects);
 
@@ -37,7 +45,7 @@ public class SongbookAdapter extends ArrayAdapter<LBSong> {
             view = inflater.inflate(R.layout.list_item_songbook, null);
         }
 
-        LBSong song = songs.get(position);
+        LBSong song = this.songs.get(position);
 
         if(song != null) {
             view.setTag(song.getId());
@@ -75,5 +83,10 @@ public class SongbookAdapter extends ArrayAdapter<LBSong> {
         }
 
         return view;
+    }
+
+    @Override
+    public int getCount() {
+        return this.songs.size();
     }
 }

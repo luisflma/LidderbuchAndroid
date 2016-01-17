@@ -25,7 +25,7 @@ import com.google.common.base.Joiner;
 /**
  * Created by luis-fleta on 12/01/16.
  */
-public class LBSong implements Serializable{
+public class LBSong implements Serializable, Comparable{
     private int id;
     private String name;
     private String language;
@@ -124,6 +124,93 @@ public class LBSong implements Serializable{
     public void setNumber(int number) {
         this.number = number;
     }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public String getWay() {
+        return way;
+    }
+
+    public void setWay(String way) {
+        this.way = way;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public String getLyrics_author() {
+        return lyrics_author;
+    }
+
+    public void setLyrics_author(String lyrics_author) {
+        this.lyrics_author = lyrics_author;
+    }
+
+    public String getMelody_author() {
+        return melody_author;
+    }
+
+    public void setMelody_author(String melody_author) {
+        this.melody_author = melody_author;
+    }
+
+    public String getLastSearchKeywords() {
+        return lastSearchKeywords;
+    }
+
+    public void setLastSearchKeywords(String lastSearchKeywords) {
+        this.lastSearchKeywords = lastSearchKeywords;
+    }
+
+    public int getLastSearchScore() {
+        return lastSearchScore;
+    }
+
+    public void setLastSearchScore(int lastSearchScore) {
+        this.lastSearchScore = lastSearchScore;
+    }
+
+    public LBSong(LBSong song) {
+        this.id = song.getId();
+        this.name = song.getName();
+        this.language = song.getLanguage();
+        this.url = song.getUrl();
+        this.category = song.getCategory();
+        this.position = song.getPosition();
+        this.paragraphs = song.getParagraphs();
+        this.update_time = song.getUpdate_time();
+
+        this.bookmarked = song.isBookmarked();
+        this.views = song.getViews();
+        this.viewTime = song.getViewTime();
+
+        this.number = song.getNumber();
+        this.way = song.getWay();
+        this.year = song.getYear();
+        this.lyrics_author = song.getLyrics_author();
+        this.melody_author = song.getMelody_author();
+    }
+
+
 
     public LBSong(JSONObject jsonSong) {
 
@@ -305,7 +392,7 @@ public class LBSong implements Serializable{
 
 
     private String lastSearchKeywords;
-    private int lastSearchScore;
+    public int lastSearchScore;
 
     public int search(String keywords) {
 
@@ -349,4 +436,11 @@ public class LBSong implements Serializable{
         return score;
     }
 
+    @Override
+    public int compareTo(Object another) {
+
+        int compareScore = ((LBSong) another).lastSearchScore;;
+
+        return compareScore - this.lastSearchScore;
+    }
 }

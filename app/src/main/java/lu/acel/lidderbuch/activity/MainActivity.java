@@ -1,5 +1,7 @@
 package lu.acel.lidderbuch.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,14 +15,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -33,18 +40,29 @@ import java.util.Date;
 import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.Settings;
 import lu.acel.lidderbuch.design.SongbookAdapter;
+import lu.acel.lidderbuch.helper.FontHelper;
 import lu.acel.lidderbuch.model.LBSong;
 import lu.acel.lidderbuch.model.LBSongbook;
 import lu.acel.lidderbuch.network.LBFetchSongs;
 
 public class MainActivity extends AppCompatActivity {
 
+    String credits = "<a href='https://itunes.apple.com/us/app/lidderbuch/id997143407?mt=8'>Lidderbuch</a> ass eng App vun der <a href='http://acel.lu/'>ACEL</a>, dem Daachverband vun iwwer 40 lëtzebuergesch Studentencercelen. De Projet gouf vum <a href='http://2f.lt/1GioavM'>Fränz Friederes</a> entwéckelt an ass op <a href='https://github.com/AcelLuxembourg/LidderbuchApp'>GitHub</a> ze fannen. <a href='http://acel.lu/about/contact'>Schreif eis</a>, wann däi Lidd feelt.";
+
+    private ArrayList<LBSong> songsWithBookmarked;
+
     private LBSongbook songbook;
+
+    private RelativeLayout creditsLayout;
+    private TextView tvMenu;
+    private ImageView toolbarInfoButton;
     private SearchView toolbarSearchButton;
 
     private ListView songbookListview;
     private SongbookAdapter songbookAdapter;
     private View footerView;
+
+    private Animation animShow, animHide;
 
     Parcelable state; // saves the scroll position of the listview
 
@@ -72,8 +90,12 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             LBSong songEdited = (LBSong) intent.getSerializableExtra("song");
+            boolean bookmarked = intent.getBooleanExtra("bookmarked", false);
             Log.d("MainActivity", "Receive song - name: " + songEdited.getName());
             songbook.integrateSong(songEdited, true, true);
+
+            if(bookmarked)
+                songbook.integrateSongBookmarked(songEdited, MainActivity.this);
         }
     };
 
@@ -81,6 +103,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simple_list_selection);
+
+        initAnimation();
+
+        creditsLayout = (RelativeLayout) findViewById(R.id.creditsLayout);
+        tvMenu = (TextView) findViewById(R.id.tvMenu);
+        tvMenu.setClickable(true);
+        tvMenu.setMovementMethod(LinkMovementMethod.getInstance());
+        tvMenu.setText(Html.fromHtml(credits));
+        tvMenu.setTypeface(FontHelper.georgia);
+
+        toolbarInfoButton = (ImageView) findViewById(R.id.toolbarInfoButton);
+        toolbarInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showHideCredits();
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar); // Attaching the layout to the toolbar object
         setSupportActionBar(toolbar);
@@ -126,10 +165,51 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("song-edited-event"));
 
     }
+
+    private void initAnimation()
+    {
+        animShow = AnimationUtils.loadAnimation( this, R.anim.view_show);
+        animHide = AnimationUtils.loadAnimation( this, R.anim.view_hide);
+    }
+
+    private void showHideCredits() {
+        if(creditsLayout.getVisibility() == View.VISIBLE) {
+            //creditsLayout.startAnimation(animHide);
+            //creditsLayout.setVisibility(View.GONE);
+            creditsLayout.animate()
+                    .translationY(0)
+                    .alpha(0.0f)
+                    .setDuration(300)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            creditsLayout.setVisibility(View.GONE);
+                        }
+                    });
+        }
+        else {
+            //creditsLayout.setVisibility(View.VISIBLE);
+            creditsLayout.animate()
+                    .translationY(creditsLayout.getHeight())
+                    .alpha(1.0f)
+                    .setDuration(300)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            creditsLayout.setVisibility(View.VISIBLE);
+                        }
+                    });
+            //creditsLayout.startAnimation(animShow);
+        }
+
+    }
+
     private void setupSearchView(SearchView searchView)
     {
         // search hint
-        searchView.setQueryHint("Rechercher");
+        searchView.setQueryHint(getString(R.string.search));
         searchView.clearFocus();
 
         // background
@@ -157,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
         refreshFooter(songbook.updateTime());
 
         if(songbook.getSongs() != null) {
-            songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, songbook.getSongs());
+            Log.i("MainActivity", "ON RESUME COUNT:" + getSongsWithBookmarked().size());
+            songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, getSongsWithBookmarked());
             songbookListview.addFooterView(footerView);
             songbookListview.setAdapter(songbookAdapter);
         }
@@ -170,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-
 
         if(songbook.isHasChangesToSave()) {
             songbook.save(this);
@@ -209,21 +289,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                ArrayList<LBSong> songsResult = songbook.search(text);
+                final ArrayList<LBSong> songsResult = songbook.search(text);
 
-                Log.i("MainActivity", "result count:" + songsResult.size());
-
-                for (LBSong song : songsResult) {
-                    Log.i("MainActivity", "song name:" + song.getName());
-                }
+//                Log.i("MainActivity", "keywords:" + text);
+//                Log.i("MainActivity", "result count:" + songsResult.size());
+//
+//                for (LBSong song : songsResult) {
+//                    Log.i("MainActivity", "song name:" + song.getName());
+//                }
 
                 if(!Thread.currentThread().isInterrupted()) {
                     // display welcome UI
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             // run on UI : refresh Listview
+                            if(songsResult.size() != 0)
+                                refreshSongsList(songsResult);
+                            else
+                                refreshSongsList(getSongsWithBookmarked());
                         }
                     });
                 }
@@ -232,6 +316,13 @@ public class MainActivity extends AppCompatActivity {
 
         thread = new Thread(runnable);
         thread.start();
+    }
+
+    private ArrayList<LBSong> getSongsWithBookmarked() {
+        songsWithBookmarked = new ArrayList<>(songbook.getSongsBookmarked());
+        songsWithBookmarked.addAll(songbook.getSongs());
+
+        return songsWithBookmarked;
     }
 
     private void refreshFooter(Date updateTime) {
@@ -244,7 +335,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshSongsList(ArrayList<LBSong> songs) {
-        songbook.integrateSongs(songs, false);
+//        songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, songs);
+//        songbookListview.setAdapter(songbookAdapter);
+        songbookAdapter.setSongs(songs);
         songbookAdapter.notifyDataSetChanged();
         refreshFooter(songbook.updateTime());
     }
@@ -267,8 +360,9 @@ public class MainActivity extends AppCompatActivity {
 
             if(refreshSongs) {
                 ArrayList<LBSong> songs = LBSongbook.songsWithData(songsArray.toString());
-
-                refreshSongsList(songs);
+                songbook.integrateSongs(songs, false);
+                Log.i("MainActivity", "ON POST EXECUTE:" + getSongsWithBookmarked().size());
+                refreshSongsList(getSongsWithBookmarked());
             }
         }
     }
