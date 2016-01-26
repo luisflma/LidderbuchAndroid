@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="?attr/actionBarSize"
     xmlns:Lidderbuch="http://schemas.android.com/apk/res-auto"
     android:background="@color/lightGray"
+    Lidderbuch:contentInsetStart="0dp"
+    Lidderbuch:contentInsetLeft="0dp"
     android:elevation="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:id="@+id/toolbarLeftWrapper"
@@ -24,8 +26,8 @@
                 <ImageView
                     android:id="@+id/toolbarInfoButton"
                     android:clickable="true"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/about_icon" />
 
 
@@ -33,8 +35,8 @@
                     android:id="@+id/toolbarSearchButton"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    Lidderbuch:searchIcon="@drawable/search_icon"
-                    Lidderbuch:closeIcon="@drawable/close_icon"
+                    Lidderbuch:searchIcon="@drawable/ic_search"
+                    Lidderbuch:closeIcon="@drawable/ic_clear"
                     Lidderbuch:queryHint="@string/search"
                     Lidderbuch:iconifiedByDefault="true">
 

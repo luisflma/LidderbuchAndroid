@@ -2,7 +2,6 @@ package lu.acel.lidderbuch.model;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -20,7 +19,6 @@ import java.util.Date;
 import lu.acel.lidderbuch.R;
 import lu.acel.lidderbuch.helper.FileHelper;
 import lu.acel.lidderbuch.Settings;
-import lu.acel.lidderbuch.helper.SongComparator;
 
 /**
  * Created by luis-fleta on 12/01/16.
@@ -30,7 +28,6 @@ public class LBSongbook {
     private boolean hasChangesToSave;
     private ArrayList<LBSong> songs;
     private ArrayList<LBSong> songsBookmarked;
-    private ArrayList<String> categories;
 
     public boolean isHasChangesToSave() {
         return hasChangesToSave;
@@ -64,24 +61,14 @@ public class LBSongbook {
     private ArrayList<LBSong> load(Context context) {
 
         ArrayList<LBSong> songsList = new ArrayList<>();
-        // try loading from local songs file
-//        File songsFile = new File(context.getFilesDir(), Settings.SONGS_FILE);
-//        if(!songsFile.exists()) {
-//            try {
-//                songsFile.createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
 
+        // try loading from shared preferences
         String songsStr = FileHelper.getKey(context, "songsJson");
 
         if(!TextUtils.isEmpty(songsStr)) {
-            Log.i("Songbook", "songs string from file is not empty");
             songsList = songsWithData(songsStr);
         } else {
             // try loading songs delivered json file from asset folder
-            Log.i("Songbook", "try load songs from json file from assets");
             songsList = songsWithData(loadJSONFromAsset(context));
         }
 
@@ -106,33 +93,13 @@ public class LBSongbook {
     }
 
     public void save(Context context) {
-//        JSONArray songsJson = new JSONArray();
-
-//        for(LBSong s : songs) {
-//            Log.i("Songbook", "sss:" + s.json());
-//            songsJson.put(s);
-//        }
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(songs);
 
-        //FileHelper.writeToFile(songsJson.toString(), context);
-
-        //Log.i("Songbook", "SAVE JSON SONGS : " + jsonStr);
         FileHelper.storeKey(context, "songsJson", jsonStr);
         hasChangesToSave = false;
     }
-
-//    public static void update(final Context context, final YalletSimpleCallback callback){
-//        try {
-//            URL url = new URL(Settings.SONGBOOK_API);
-//
-//            //todo call http request
-//
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public String loadJSONFromAsset(Context context) {
         String json = null;
@@ -175,7 +142,6 @@ public class LBSongbook {
         if(TextUtils.isEmpty(songsTxt))
             return null;
 
-        //Log.i("Songbook", "songs json : " + songsTxt);
         ArrayList<LBSong> songsList = new ArrayList<>();
         try {
             JSONArray jsonSongs = new JSONArray(songsTxt);
@@ -201,7 +167,6 @@ public class LBSongbook {
         Date updateTime = null;
         for(int i = 0 ; i < songs.size() ; i++) {
             if(updateTime == null || songs.get(i).getUpdate_time().getTime() > updateTime.getTime()) {
-                Log.i("Songbook", "song updateTime:" + songs.get(i).getUpdate_time());
                 updateTime = songs.get(i).getUpdate_time();
             }
         }
@@ -239,9 +204,6 @@ public class LBSongbook {
         }
 
         if(propagate) {
-            Log.i("Songbook", "HAS CHANGES TO SAVE = TRUE");
-            reloadMeta();
-
             hasChangesToSave = true;
         }
     }
@@ -263,10 +225,6 @@ public class LBSongbook {
         copySong.setCategory(context.getString(R.string.bookmarked));
 
         return copySong;
-    }
-
-    private void reloadMeta() {
-        // todo reload meta
     }
 
     public ArrayList<LBSong> search(String keyword) { //may be callback
@@ -299,17 +257,7 @@ public class LBSongbook {
             }
         }
 
-        Log.i("Songbook", "BEFORE");
-        for(LBSong so : songsResult) {
-            Log.i("Songbook", "BEF song name:" + so.getName());
-        }
-
         Collections.sort(songsResult);
-
-        Log.i("Songbook", "AFTER");
-        for(LBSong so : songsResult) {
-            Log.i("Songbook", "AFT song name:" + so.getName());
-        }
 
         return songsResult;
     }

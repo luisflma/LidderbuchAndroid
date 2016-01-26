@@ -10,7 +10,7 @@ import lu.acel.lidderbuch.R;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static int SPLASH_TIME_OUT = 200;
+    private static int SPLASH_TIME_OUT = 350;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

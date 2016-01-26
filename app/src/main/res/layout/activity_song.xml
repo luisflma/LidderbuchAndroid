@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.SongActivity">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar_song">
-    </include>
 
-    <ScrollView
+    <lu.acel.lidderbuch.design.ObservableScrollView
         android:id="@+id/svLyrics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:layout_below="@id/toolbar">
+        android:paddingTop="?attr/actionBarSize"
+        android:background="@android:color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -58,7 +54,11 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </lu.acel.lidderbuch.design.ObservableScrollView>
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_song">
+    </include>
 
-</RelativeLayout>
+</FrameLayout>

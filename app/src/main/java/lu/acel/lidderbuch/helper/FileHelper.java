@@ -2,8 +2,6 @@ package lu.acel.lidderbuch.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -64,7 +62,7 @@ public class FileHelper {
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+
         }
     }
 
@@ -134,9 +132,9 @@ public class FileHelper {
             }
         }
         catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
+            e.printStackTrace();
         } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
+            e.printStackTrace();
         }
 
         return ret;

@@ -2,7 +2,6 @@ package lu.acel.lidderbuch.model;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -230,11 +229,9 @@ public class LBSong implements Serializable, Comparable{
                 } catch(NumberFormatException nfe) {
                     //SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy  hh:mm:ss a");
                     try {
-                        Log.i("Song", "timeStampStr:" + timeStampStr);
                         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
                         update_time = format.parse(timeStampStr);
                     } catch (ParseException e) {
-                        Log.i("Song", "ParseException::");
                         e.printStackTrace();
                     }
                 }
@@ -270,7 +267,6 @@ public class LBSong implements Serializable, Comparable{
                         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
                         update_time = format.parse(timeStampStr);
                     } catch (ParseException e) {
-                        Log.i("Song", "ParseException:ViewTimeStamp:");
                         e.printStackTrace();
                     }
                 }
@@ -406,8 +402,6 @@ public class LBSong implements Serializable, Comparable{
 
         // search in meta data
         score += StringHelper.countOccurrences(name, keywords);
-
-        Log.i("Song", "name:" + name + " score:" + score);
 
         if(!TextUtils.isEmpty(way)) {
             score += StringHelper.countOccurrences(way, keywords);

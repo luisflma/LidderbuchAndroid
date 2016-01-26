@@ -1,12 +1,9 @@
 package lu.acel.lidderbuch.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -17,14 +14,12 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -75,23 +70,21 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-            //String arg0 = String.valueOf(songbook.updateTime().getTime() / 1000);
-            String arg0 = String.valueOf(1440754883); // for test
+            String arg0 = String.valueOf(songbook.updateTime().getTime() / 1000);
+            //String arg0 = String.valueOf(1440754883); // for test
             String url = MessageFormat.format(Settings.SONGBOOK_API, arg0);
-            Log.i("MainActivity", "url:" + url);
             new FetchSongsTask().execute(url);
 
-            handler.postDelayed(runnableSongs, 30000000); //300000
+            handler.postDelayed(runnableSongs, 300000); //300000
         }
     };
 
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
+
             LBSong songEdited = (LBSong) intent.getSerializableExtra("song");
             boolean bookmarked = intent.getBooleanExtra("bookmarked", false);
-            Log.d("MainActivity", "Receive song - name: " + songEdited.getName());
             songbook.integrateSong(songEdited, true, true);
 
             if(bookmarked)
@@ -129,10 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
         toolbarSearchButton.clearFocus();
         setupSearchView(toolbarSearchButton);
-//        ((EditText)toolbarSearchButton.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setTextColor(Color.BLACK);
-//        // icon
-//        ImageView searchIcon = (ImageView) toolbarSearchButton.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
-//        searchIcon.setImageResource(R.drawable.search_icon);
 
         toolbarSearchButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -146,9 +135,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-//        int id = toolbarSearchButton.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        TextView textView = (TextView) toolbarSearchButton.findViewById(id);
-//        textView.setTextColor(Color.WHITE);
 
         songbookListview = (ListView) findViewById(R.id.singleChoiceListView);
         songbookListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -160,86 +146,21 @@ public class MainActivity extends AppCompatActivity {
 
         songbook = new LBSongbook(this);
 
+        songbookListview.addFooterView(footerView);
+        refreshFooter(songbook.updateTime());
+
         handler.post(runnableSongs);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("song-edited-event"));
 
     }
 
-    private void initAnimation()
-    {
-        animShow = AnimationUtils.loadAnimation( this, R.anim.view_show);
-        animHide = AnimationUtils.loadAnimation( this, R.anim.view_hide);
-    }
-
-    private void showHideCredits() {
-        if(creditsLayout.getVisibility() == View.VISIBLE) {
-            //creditsLayout.startAnimation(animHide);
-            //creditsLayout.setVisibility(View.GONE);
-            creditsLayout.animate()
-                    .translationY(0)
-                    .alpha(0.0f)
-                    .setDuration(300)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            creditsLayout.setVisibility(View.GONE);
-                        }
-                    });
-        }
-        else {
-            //creditsLayout.setVisibility(View.VISIBLE);
-            creditsLayout.animate()
-                    .translationY(creditsLayout.getHeight())
-                    .alpha(1.0f)
-                    .setDuration(300)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            creditsLayout.setVisibility(View.VISIBLE);
-                        }
-                    });
-            //creditsLayout.startAnimation(animShow);
-        }
-
-    }
-
-    private void setupSearchView(SearchView searchView)
-    {
-        // search hint
-        searchView.setQueryHint(getString(R.string.search));
-        searchView.clearFocus();
-
-        // background
-        View searchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
-        //searchPlate.setBackgroundResource(R.drawable.searchview_bg);
-
-        // icon
-        ImageView searchIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
-        searchIcon.setImageResource(R.drawable.search_icon);
-
-        // clear button
-        ImageView searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-        searchClose.setImageResource(R.drawable.close_icon);
-
-        // text color
-        AutoCompleteTextView searchText = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        searchText.setTextColor(getResources().getColor(R.color.darkGray));
-        searchText.setHintTextColor(getResources().getColor(R.color.hintGray));
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
 
-        refreshFooter(songbook.updateTime());
-
         if(songbook.getSongs() != null) {
-            Log.i("MainActivity", "ON RESUME COUNT:" + getSongsWithBookmarked().size());
             songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, getSongsWithBookmarked());
-            songbookListview.addFooterView(footerView);
             songbookListview.setAdapter(songbookAdapter);
         }
 
@@ -276,6 +197,46 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    private void initAnimation() {
+        animShow = AnimationUtils.loadAnimation( this, R.anim.view_show);
+        animHide = AnimationUtils.loadAnimation( this, R.anim.view_hide);
+    }
+
+    private void showHideCredits() {
+        if(creditsLayout.getVisibility() == View.VISIBLE) {
+            //creditsLayout.startAnimation(animHide);
+            creditsLayout.setVisibility(View.GONE);
+        }
+        else {
+            creditsLayout.setVisibility(View.VISIBLE);
+            //creditsLayout.startAnimation(animShow);
+        }
+
+    }
+
+    private void setupSearchView(SearchView searchView) {
+        // search hint
+        searchView.setQueryHint(getString(R.string.search));
+        searchView.clearFocus();
+
+        // background
+        View searchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        //searchPlate.setBackgroundResource(R.drawable.searchview_bg);
+
+        // icon
+        ImageView searchIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+        searchIcon.setImageResource(R.drawable.ic_search);
+
+        // clear button
+        ImageView searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        searchClose.setImageResource(R.drawable.ic_clear);
+
+        // text color
+        AutoCompleteTextView searchText = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchText.setTextColor(getResources().getColor(R.color.darkGray));
+        searchText.setHintTextColor(getResources().getColor(R.color.hintGray));
+    }
+
     private void handleClickOnSong(View view) {
         Intent i = new Intent(this, SongActivity.class);
         LBSong song = songbook.songWithId((int)view.getTag());
@@ -290,13 +251,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 final ArrayList<LBSong> songsResult = songbook.search(text);
-
-//                Log.i("MainActivity", "keywords:" + text);
-//                Log.i("MainActivity", "result count:" + songsResult.size());
-//
-//                for (LBSong song : songsResult) {
-//                    Log.i("MainActivity", "song name:" + song.getName());
-//                }
 
                 if(!Thread.currentThread().isInterrupted()) {
                     // display welcome UI
@@ -335,8 +289,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshSongsList(ArrayList<LBSong> songs) {
-//        songbookAdapter = new SongbookAdapter(this, R.layout.list_item_songbook, songs);
-//        songbookListview.setAdapter(songbookAdapter);
         songbookAdapter.setSongs(songs);
         songbookAdapter.notifyDataSetChanged();
         refreshFooter(songbook.updateTime());
@@ -361,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
             if(refreshSongs) {
                 ArrayList<LBSong> songs = LBSongbook.songsWithData(songsArray.toString());
                 songbook.integrateSongs(songs, false);
-                Log.i("MainActivity", "ON POST EXECUTE:" + getSongsWithBookmarked().size());
                 refreshSongsList(getSongsWithBookmarked());
             }
         }
