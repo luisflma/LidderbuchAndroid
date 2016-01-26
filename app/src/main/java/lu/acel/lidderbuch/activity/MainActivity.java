@@ -42,7 +42,7 @@ import lu.acel.lidderbuch.network.LBFetchSongs;
 
 public class MainActivity extends AppCompatActivity {
 
-    String credits = "<a href='https://itunes.apple.com/us/app/lidderbuch/id997143407?mt=8'>Lidderbuch</a> ass eng App vun der <a href='http://acel.lu/'>ACEL</a>, dem Daachverband vun iwwer 40 lëtzebuergesch Studentencercelen. De Projet gouf vum <a href='http://2f.lt/1GioavM'>Fränz Friederes</a> entwéckelt an ass op <a href='https://github.com/AcelLuxembourg/LidderbuchApp'>GitHub</a> ze fannen. <a href='http://acel.lu/about/contact'>Schreif eis</a>, wann däi Lidd feelt.";
+    String credits = "<a href='http://www.acel.lu/publications/lidderbuch'>Lidderbuch</a> ass eng App vun der <a href='http://acel.lu/'>ACEL</a>, dem Daachverband vun iwwer 40 lëtzebuergesch Studentencercelen. De Projet gouf vum <a href='http://2f.lt/1GioavM'>Fränz Friederes</a> entwéckelt an ass op <a href='https://github.com/AcelLuxembourg/LidderbuchApp'>GitHub</a> ze fannen. <a href='http://acel.lu/about/contact'>Schreif eis</a>, wann däi Lidd feelt.";
 
     private ArrayList<LBSong> songsWithBookmarked;
 
